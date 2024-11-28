@@ -23,9 +23,6 @@ const LoginPage = () => {
                 body: JSON.stringify({ email, password }),
                 credentials: 'include', // Include cookies in the request
                 });
-
-
-            console.log(response)
             
             if (response.ok) {
                 const data = await response.json();

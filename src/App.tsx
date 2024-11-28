@@ -11,32 +11,28 @@ function App() {
 
   useEffect(() => {
 
+    const checkAuthCookie = async () => {
+      try {
+          const response = await fetch('http://localhost:5000/api/users/protected', {
+          method: 'GET',
+          credentials: 'include', // Include cookies
+      });
 
+        if (response.ok) {
+            const data = await response.json();
+            setUserId(data.userId); 
+            setIsAuthenticated(true);
+          } 
 
-const checkAuthCookie = async () => {
-  try {
-      const response = await fetch('http://localhost:5000/api/users/protected', {
-      method: 'GET',
-      credentials: 'include', // Include cookies
-  });
+        else {
+            setIsAuthenticated(false);
+        }
 
+      } catch (error) {
+        setIsAuthenticated(false);
+} };
 
-    if (response.ok) {
-
-        const data = await response.json();
-        console.log(data.userId)
-        setUserId(data.userId); // Set user ID from the response
-        setIsAuthenticated(true);
-      } else {
-
-          setIsAuthenticated(false);
-      }} catch (error) {
-          setIsAuthenticated(false);
-
-      }
-
-};
-checkAuthCookie();
+  checkAuthCookie();
 
 }, []);
 
@@ -63,7 +59,7 @@ checkAuthCookie();
             isAuthenticated ? (
               <Navigate to={`/user/${userId}`} />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/signup" />
             )
           }
         />
