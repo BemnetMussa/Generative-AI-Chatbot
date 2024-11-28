@@ -1,42 +1,49 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 const LoginPage = () => {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-
     const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // Make sure email and password are not empty
         if (!email || !password) {
             setError('Email and password are required');
             return;
         }
 
-        const signupData = { email, password };
-
         try {
-            const response = await fetch('http://localhost:5000/api/users/login', 
-                { method: 'POST', headers: { 'Content-Type': 'application/json',}, body: JSON.stringify(signupData), });
+            const response = await fetch('http://localhost:5000/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include', // Include cookies in the request
+                });
 
-            const data = await response.json();
 
-            if (response.ok) {
-                // Redirect to login page if signup is successful
-                navigate('/');
-            } else {
-                // Show the error message from the server
-                setError(data.message || 'Something went wrong');
-            }
+            console.log(response)
             
+            if (response.ok) {
+                const data = await response.json();
+
+        
+                if (data.userId) {
+                    navigate(`/user/${data.userId}`);
+                } else {
+                    setError('User ID not found in the response');
+                }
+
+            } else {
+                const data = await response.json();
+                setError(data.message || 'Login failed');
+            }
+
         } catch (error) {
-            console.error('Error:', error);
+            console.error(error);
             setError('An error occurred. Please try again.');
         }
     };
